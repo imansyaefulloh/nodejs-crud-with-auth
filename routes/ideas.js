@@ -9,7 +9,7 @@ const router = express.Router();
 const Idea = require('../models/Idea');
 
 router.get('/', ensureAuthenticated, (req, res) => {
-  Idea.find({})
+  Idea.find({ user: req.user.id })
     .sort({ date: 'desc' })
     .then(ideas => {
       res.render('ideas/index', { ideas });
@@ -40,7 +40,8 @@ router.post('/', ensureAuthenticated, (req, res) => {
     const { title, details } = req.body;
     const newIdea = {
       title,
-      details
+      details,
+      user: req.user.id
     };
     new Idea(newIdea)
       .save()
@@ -56,6 +57,12 @@ router.post('/', ensureAuthenticated, (req, res) => {
 router.get('/edit/:id', ensureAuthenticated, (req, res) => {
   Idea.findOne({ _id: req.params.id })
     .then(idea => {
+      if (idea.user != req.user.id) {
+        req.flash('error_msg', 'Not Authorized');
+        res.redirect('/ideas');
+        return;
+      }
+
       res.render('ideas/edit', { idea });
     })
     .catch(err => console.log(err));
@@ -64,6 +71,12 @@ router.get('/edit/:id', ensureAuthenticated, (req, res) => {
 router.put('/:id', ensureAuthenticated, (req, res) => {
   Idea.findOne({ _id: req.params.id })
     .then(idea => {
+      if (idea.user != req.user.id) {
+        req.flash('error_msg', 'Not Authorized');
+        res.redirect('/ideas');
+        return;
+      }
+
       idea.title = req.body.title;
       idea.details = req.body.details;
 
@@ -80,6 +93,12 @@ router.put('/:id', ensureAuthenticated, (req, res) => {
 router.delete('/:id', ensureAuthenticated, (req, res) => {
   Idea.remove({ _id: req.params.id })
     .then(idea => {
+      if (idea.user != req.user.id) {
+        req.flash('error_msg', 'Not Authorized');
+        res.redirect('/ideas');
+        return;
+      }
+
       req.flash('success_msg', 'Idea removed');
       res.redirect('/ideas');
     })

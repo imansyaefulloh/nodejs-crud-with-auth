@@ -1,0 +1,26 @@
+{{#each errors}}
+<div class="alert alert-danger alert-dismissible fade show" role="alert">
+  <strong>Error!</strong> {{text}}
+  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+{{else}}
+
+{{/each }}
+
+<div class="card card-body">
+  <h3>Edit Video Idea</h3>
+  <form action="/ideas/{{idea.id}}?_method=PUT" method="POST">
+    <input type="hidden" name="_method" value="PUT">
+    <div class="form-group">
+      <label for="title">Title</label>
+      <input type="text" name="title" value="{{idea.title}}" class="form-control" />
+    </div>
+    <div class="form-group">
+      <label for="details">details</label>
+      <textarea name="details" id="details" class="form-control">{{idea.details}}</textarea>
+    </div>
+    <button class="btn btn-primary">Submit</button>
+  </form>
+</div>
